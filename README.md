@@ -156,6 +156,13 @@ DFD Level 1 Diagram of the system
 
 
 
+Image Detection                                                   
+![image](https://github.com/user-attachments/assets/a7f4ce51-ff86-4be9-870d-5159994e2524)   
+
+
+Video Detection
+![image](https://github.com/user-attachments/assets/cadecab1-5a12-4860-9f74-67862f3de42a)
+
 
 
 
