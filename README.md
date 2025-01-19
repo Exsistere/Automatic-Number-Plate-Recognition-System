@@ -6,7 +6,9 @@ Traffic control and vehicle owner identification has become major problems in ev
 
 
 
+![image](https://github.com/user-attachments/assets/1efb89e5-a671-4880-aba6-5d6774b811af)
 
+![image](https://github.com/user-attachments/assets/67fb48b1-98d9-45c4-a204-4011d7aff586)
 
 
 
