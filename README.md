@@ -192,168 +192,32 @@ Users can upload an image or video of a vehicle, and the system, powered by the 
  
 
 
-Activity Diagram For Our System
+Activity Diagram For The System
+
+![image](https://github.com/user-attachments/assets/8a8a9e20-e4a0-4807-845f-4f802701a1f3)
 
 
  
 Iterative Design Diagram
 
+![image](https://github.com/user-attachments/assets/8a5a382b-1524-4014-a0e2-c427d830eea4)
+
  
-DFD Level 0 Diagram of the system
-
-
  
 DFD Level 1 Diagram of the system
 
+![image](https://github.com/user-attachments/assets/cfa7545c-8f34-41d8-9e8b-d125a0ac05a2)
 
 
 
 
-Code Snippets:
 
 
-def detect_fn(image):
-    image, shapes = detection_model.preprocess(image)
-    prediction_dict = detection_model.predict(image, shapes)
-    detections = detection_model.postprocess(prediction_dict, shapes)
-    return detections
 
-@st.cache()
-def detect_func(img, MAX_BOXES_TO_DRAW, MIN_SCORE_THRES):
-    image_np = np.array(img)
-    #print("Image NP: \n", image_np)
 
-    input_tensor = tf.convert_to_tensor(np.expand_dims(image_np, 0), dtype = tf.float32)
-    detections = detect_fn(input_tensor)
 
-    num_detections = int(detections.pop('num_detections'))
-    detections = {key: value[0, :num_detections].numpy()
-                    for key, value in detections.items()}
-    detections['num_detections'] = num_detections
 
-    # detection_classes should be ints.
-    detections['detection_classes'] = detections['detection_classes'].astype(np.int64)
 
-    label_id_offset = 1
-    image_np_with_detections = image_np.copy()
 
-    viz_utils.visualize_boxes_and_labels_on_image_array(
-                image_np_with_detections,
-                detections['detection_boxes'],
-                detections['detection_classes'] + label_id_offset,
-                detections['detection_scores'],
-                category_index,
-                use_normalized_coordinates = True,
-                max_boxes_to_draw = MAX_BOXES_TO_DRAW,
-                min_score_thresh = MIN_SCORE_THRES,
-                agnostic_mode = False)
 
-    return image_np_with_detections, detections
 
-############ Apply OCR to Detection ############
-
-# region_threshold = 0.05
-# detection_threshold = 0.7
-
-@st.cache()
-def filter_text(region, ocr_result, region_threshold):
-    rectangle_size = region.shape[0]*region.shape[1]
-
-    plate = []
-    for result in ocr_result:
-        length = np.sum(np.subtract(result[0][1], result[0][0]))
-        height = np.sum(np.subtract(result[0][2], result[0][1]))
-
-        if length*height / rectangle_size > region_threshold:
-            plate.append(result[1])
-    return plate
-
-@st.cache(allow_output_mutation = True)
-def ocr_it(image, detections, detection_threshold, region_threshold):
-
-    # Scores, boxes and classes above threhold
-    scores = list(filter(lambda x: x > detection_threshold, detections['detection_scores']))
-    boxes = detections['detection_boxes'][:len(scores)]
-    classes = detections['detection_classes'][:len(scores)]
-
-    # Full image dimensions
-    width = image.shape[1]
-    height = image.shape[0]
-
-    # Apply ROI filtering and OCR
-    for idx, box in enumerate(boxes):
-        roi = box*[height, width, height, width]
-        region = image[int(roi[0]):int(roi[2]),int(roi[1]):int(roi[3])]
-        reader = easyocr.Reader(['en'])
-        ocr_result = reader.readtext(region)
-
-        text = filter_text(region, ocr_result, region_threshold)
-
-        # plt.imshow(cv2.cvtColor(region, cv2.COLOR_BGR2RGB))
-        # plt.show()
-        print(text)
-        return text, region, roi, boxes, scores, classes
-
-
-
-
-
-
- 
- 
-Web Camera
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3.	Results
-The results of the project have demonstrated the effectiveness of the Automatic Number Plate Recognition (ANPR) system. The system was able to accurately detect and recognize vehicle license plates from various input images. The use of the Object Detection API and EasyOCR proved to be highly effective for the tasks of vehicle and number plate detection, and license plate number extraction, respectively. The user-friendly interface provided by Streamlit allowed for easy interaction with the system, making it practical for real-world use.
-
-
- 
-Detecting Image
-
- 
-Detecting video
-
- Conclusion and Future Scope
-
-Conclusion:
-
-In the pursuit of developing an Automatic Number Plate Recognition (ANPR) system, our approach emphasizes the extraction of text and characters from vehicle number plates. Leveraging advanced techniques such as OpenCV, Image Processing, and Optical Character Recognition (OCR), we have established a foundation for a robust system capable of accurately identifying and interpreting license plates. Notably, the versatility of this approach ensures its effectiveness even in challenging lighting conditions, including low light and dark environments. As a result, the successful implementation of these technologies contributes to the system's reliability in capturing crucial information from vehicle number plates.
-
-
-Future Scope:
-
-Looking forward, our vision for the future of this ANPR system extends beyond its current capabilities. We aspire to scale up the system, making it accessible to a broader user base while focusing on enhancing the efficiency and seamlessness of the entire image detection process. The goal is to transition from a conceptual framework to a practical solution that can be deployed in real-life scenarios, catering to the specific needs of companies and users alike. The adaptability of our system positions it as a versatile tool with potential applications in various settings, such as highways, car tolls, and other environments where ANPR systems play a crucial role. As part of our future plans, continuous refinement and customization will be undertaken to align the system with evolving technological landscapes and real-world challenges, ensuring its relevance and effectiveness in diverse contexts. Ultimately, we aim to contribute to the broader integration of ANPR technology into everyday life, providing efficient solutions for the identification and monitoring of vehicles. 
-References
-[1] Amninder Kaur, Sonika Jindal ,Richa Jindal “License Plate Recognition Using Support Vector Machine (SVM)” Dept. Of Computer Science, International Journal of Advanced Research in Computer Science and Software Engineering, Volume 2, Issue 7. 
-
-[2] ANISH LAZRUS,SIDDHARTHA CHOUBEY,SINHA G.R.,”AN EFFICIENT METHOD OF VEHICLE NUMBER PLATE DETECTION AND RECOGNITION” Department of Computer Science, International Journal of Machine Intelligence, Volume 3, Issue 3. 
-
-[3] Abhay Singh, Anand Kumar Gupta ,Anmol Singh, Anuj Gupta ,Sherish Johri, “VEHICLE NUMBER PLATE DETECTION USING IMAGE PROCESSING”, Department of IT, Volume: 05 Issue: 03 | Mar-2018 
-
-[4] Ganesh R. Jadhav, Kailash J. Karande, “Automatic Vehicle Number Plate Recognition for Vehicle Parking Management System”, IISTE, Vol.5, No.11, 2014. 
-
-[5] Mutua Simon Mandi ,Bernard Shibwabo, Kaibiru Mutua Raphael, ”An Automatic Number Plate Recognition System for Car Park Management”, International Journal of Computer Applications, Volume 175 – No.7, October 2017 
-
-[6] https://en.wikipedia.org/wiki/Automatic_number-plate_recognition
-
-[7] https://www.kaggle.com/datasets/andrewmvd/car-plate-detection
